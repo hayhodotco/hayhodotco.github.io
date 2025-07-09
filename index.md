@@ -1,6 +1,0 @@
----
----
-
-# Hayho
-
-hayho.co

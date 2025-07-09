@@ -1,0 +1,21 @@
+// https://zed.dev/docs/configuring-zed#settings-files
+// https://biomejs.dev/reference/zed/
+{
+	"auto_install_extensions": {
+		"biome": true
+	},
+	"code_actions_on_format": {
+		"source.action.useSortedAttributes.biome": true,
+		"source.action.useSortedKeys.biome": true,
+		"source.fixAll.biome": true,
+		"source.organizeImports.biome": true
+	},
+	"file_types": {
+		"Shell Script": [".editorconfig"]
+	},
+	"formatter": {
+		"language_server": {
+			"name": "biome"
+		}
+	}
+}

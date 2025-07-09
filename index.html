@@ -1,1 +1,58 @@
-<!doctype html><html>  <head>    <meta charset="UTF-8" />    <meta name="viewport" content="width=device-width, initial-scale=1.0" />    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>    <style type="text/tailwindcss">      @theme {        --color-clifford: #da373d;      }    </style>  </head>  <body>    <h1 class="text-3xl font-bold underline text-clifford">      Hello world!    </h1>  </body></html>
+<!doctype html>
+<html lang="en-US" dir="ltr" class="dark">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>HAYHO</title>
+		<link rel="stylesheet" href="@global/styles.css">
+		<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+		<style type="text/tailwindcss">
+            @theme {
+                --color-clifford: #da373d;
+            }
+        </style>
+	</head>
+	<body class="antialiased font-sans">
+		<dialog
+			class="bg-[#2727E6] text-white font-mono w-full py-2 pl-2 pr-10 text-1rem relative"
+			open
+		>
+			<div class="uppercase border-1 border-dashed border-clifford flex">
+				<span>👾 Greetings, one and all!</span>
+				<span>👾 Greetings, one and all!</span>
+				<span>👾 Greetings, one and all!</span>
+			</div>
+			<form method="dialog">
+				<button class="absolute top-0 right-0">X</button>
+			</form>
+		</dialog>
+
+		<!-- <div
+			class="bg-[#2727E6] text-white font-mono relative block w-full text-1rem"
+		>
+			<div class="position-absolute top-0 right-0 p-2">
+                <button onclick="dialog" class="bg-white text-black rounded-full p-1">X</button>
+            </div>
+			<div class="uppercase bg-red-200 text-red-500">hayho.co</div>
+		</div> -->
+		<header
+			class="container mx-auto border-1 border-dashed border-clifford sticky top-0"
+		>
+			<a href="/">HAYHO</a>
+			<nav>
+				<a href="/about">About</a>
+				<a href="/contact">Contact</a>
+			</nav>
+		</header>
+		<main>
+			<article class="container mx-auto min-h-screen">
+				<h1 class="text-3xl font-bold underline text-clifford">
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+				</h1>
+			</article>
+		</main>
+		<footer class="border-1 border-dashed border-clifford">
+			© 2025 HAYHO, CO. All rights reserved.
+		</footer>
+	</body>
+</html>
