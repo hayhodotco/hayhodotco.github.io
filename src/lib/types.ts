@@ -1,4 +1,4 @@
-type Page = {
+export type Page = {
 	url: string
 	content: string
 	file: string

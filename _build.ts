@@ -109,7 +109,7 @@ const render = (parsed: Page) => {
 		})
 	const render = njk.render(layout, {
 		content: parsed.content,
-		description: site.description,
+		description: parsed.frontmatter?.description ?? site.description,
 		locale: site.locale,
 		site_name: site.name,
 		title: parsed.frontmatter?.title ?? '',
