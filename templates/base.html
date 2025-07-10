@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en-US" dir="ltr" class="dark">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="{{ description }}">
+
+		<title>{{ title }} - {{ site_name }}</title>
+
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+	</head>
+	<body class="antialiased font-sans">
+		{% include "header.html" %}
+		<main>
+			{% block content %}<article>CONTENT</article>{% endblock %}
+		</main>
+		<footer>© 2025 {{ site_name }}. All rights reserved.</footer>
+	</body>
+</html>

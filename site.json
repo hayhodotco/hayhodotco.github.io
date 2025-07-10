@@ -1,0 +1,12 @@
+{
+	"author": "Hayho",
+	"description": "Hayho is a personal website.",
+	"email": "hayho@example.com",
+	"name": "Hayho Co",
+	"social": {
+		"facebook": "https://facebook.com/hayho",
+		"instagram": "https://instagram.com/hayho",
+		"twitter": "https://twitter.com/hayho"
+	},
+	"website": "https://hayhodotco.github.io"
+}

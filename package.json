@@ -1,11 +1,13 @@
 {
 	"dependencies": {
 		"gray-matter": "^4.0.3",
-		"marked": "^16.0.0"
+		"marked": "^16.0.0",
+		"nunjucks": "^3.2.4"
 	},
 	"devDependencies": {
 		"@nndvn/cfgs": "git+https://github.com/nndvn/cfgs.git",
-		"@types/bun": "^1.2.18"
+		"@types/bun": "^1.2.18",
+		"@types/nunjucks": "^3.2.6"
 	},
 	"module": "index.ts",
 	"name": "hayhodotco.github.io",
@@ -14,12 +16,12 @@
 	},
 	"private": true,
 	"scripts": {
-		"build": "rm -rf dist && bun build --outdir=dist ./index.html",
-		"dev": "bun ./index.html --console",
+		"build": "rm -rf docs && bun run build.ts",
+		"dev": "bun run build && bun run preview",
 		"fix": "biome check --fix",
 		"format": "biome format --fix",
 		"lint": "biome lint --fix",
-		"preview": "bun ./docs/**/*.html --console"
+		"preview": "bun ./docs/**/*.html"
 	},
 	"type": "module"
 }

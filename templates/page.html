@@ -1,27 +1,5 @@
-<!doctype html>
-<html lang="en-US" dir="ltr" class="dark">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>SITE_NAME - {{TITLE}}</title>
-		<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-		<style type="text/tailwindcss">
-            @theme {
-                --color-clifford: #da373d;
-            }
-        </style>
-	</head>
-	<body class="antialiased font-sans">
-		<header>
-			<a href="/">SITE_NAME</a>
-			<nav>
-				<a href="/about">About</a>
-				<a href="/contact">Contact</a>
-			</nav>
-		</header>
-		<main>
-			<article>{{CONTENT}}</article>
-		</main>
-		<footer>© 2025 HAYHO, CO. All rights reserved.</footer>
-	</body>
-</html>
+{% extends "base.html" %}
+<!-- CONTENT -->
+{% block content %}
+<article>{{ content }}</article>
+{% endblock %}
