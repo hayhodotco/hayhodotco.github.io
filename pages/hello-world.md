@@ -29,4 +29,4 @@ To get started with Markdown, you can use a simple text editor or a dedicated Ma
 - [Markdown Cookbook](https://www.markdownguide.org/cookbook/)
 - [Markdown FAQ](https://www.markdownguide.org/faq/)
 
-![Hayho](./attachments/gh-ava.png)
+![Hayho](./assets/hayho-ava.png)
