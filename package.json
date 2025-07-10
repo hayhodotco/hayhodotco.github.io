@@ -17,7 +17,7 @@
 	"private": true,
 	"scripts": {
 		"build": "rm -rf docs && bun run build.ts",
-		"dev": "bun run build && bun run preview",
+		"dev": "bun --watch run index.ts",
 		"fix": "biome check --fix",
 		"format": "biome format --fix",
 		"lint": "biome lint --fix",
