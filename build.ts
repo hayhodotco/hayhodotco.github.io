@@ -74,12 +74,29 @@ const render = (parsed: Page) => {
 	const layout = parsed.frontmatter?.layout
 		? `${(parsed.frontmatter?.layout as string).toLowerCase()}.html`
 		: DEFAULT_LAYOUT
-	return njk.render(layout, {
+	// wip: rewriter
+	const rewriter = new HTMLRewriter().on('[rel="icon"]', {
+		element(el) {
+			const href = el.getAttribute('href')
+			if (href) {
+				el.setAttribute('href', `.${href}`)
+			}
+		},
+	})
+	const render = njk.render(layout, {
 		content: parsed.content,
 		description: site.description,
 		site_name: site.name,
 		title: parsed.frontmatter?.title ?? '',
 	})
+	const result = rewriter.transform(render)
+	// return njk.render(layout, {
+	// 	content: parsed.content,
+	// 	description: site.description,
+	// 	site_name: site.name,
+	// 	title: parsed.frontmatter?.title ?? '',
+	// })
+	return result
 }
 
 const main = async () => {
@@ -113,11 +130,15 @@ const main = async () => {
 		await file(destination).write(rendered_post)
 	}
 
+	// console.log('📦 Đang gói các tài sản...')
+
 	// await Bun.build({
-	// 	entrypoints: ['./docs/**/*.html'],
+	// 	entrypoints: ['./index.ts'], // Ví dụ: nếu bạn có tệp JS/TS chính
 	// 	minify: true,
-	// 	outdir: './dist',
+	// 	outdir: './docs/assets',
 	// })
+
+	console.log('\n🎉 Quá trình xây dựng hoàn tất!')
 }
 
 main()
