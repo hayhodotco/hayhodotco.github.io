@@ -17,11 +17,11 @@
 	"private": true,
 	"scripts": {
 		"build": "rm -rf dist && bun run src/build.ts",
-		"dev": "bun --watch run src/server.ts",
+		"dev": "bun --watch --hot run src/server.ts",
 		"fix": "biome check --fix",
 		"format": "biome format --fix",
 		"lint": "biome lint --fix",
-		"preview": "bun ./docs/**/*.html"
+		"preview": "bun ./dist/**/*.html"
 	},
 	"type": "module"
 }

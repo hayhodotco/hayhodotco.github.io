@@ -1,55 +1,95 @@
-import { access, mkdir, readdir } from 'node:fs/promises'
+import {
+	access,
+	readdir,
+	// mkdir,
+} from 'node:fs/promises'
 import { resolve } from 'node:path'
+import { Glob, write } from 'bun'
 import matter from 'gray-matter'
 import { marked } from 'marked'
 import nunjucks from 'nunjucks'
-import site from '../../site.json'
-import type { Page } from './types'
+import site from '~config'
+import {
+	DEFAULT_LAYOUT,
+	INPUT_DIR,
+	OUTPUT_DIR,
+	TEMPLATE_DIR,
+} from '~lib/constants'
+import type { Page } from '~lib/types'
 
-export const capitalize = (str: string) =>
-	str.charAt(0).toUpperCase() + str.slice(1)
-export const get_all_markdowns = async (
-	dir: string
+// export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
+
+// get files
+export const get_files = async (
+	dir: string,
+	pattern: string
 ): Promise<ReadonlyArray<string>> => {
-	console.log(`Getting all files from ${dir}...`)
-	const files = await readdir(resolve(dir), { recursive: true })
+	if (!access(dir)) {
+		throw new Error(`Directory ${dir} does not exist`)
+	}
+
+	console.log(`Getting all files (${pattern}) from '${dir}' directory...`)
+	const glob = new Glob(pattern)
+	const scanned = glob.scan(dir)
+	const files = []
+	for await (const file of scanned) {
+		// console.log(`Scanning ${file}...`)
+		files.push(file)
+	}
+
 	console.log(`Found ${files.length} files`)
-	return files.filter((file) => file.endsWith('.md'))
+	return files
 }
+// export const get_all_markdowns = async (
+// 	dir: string
+// ): Promise<ReadonlyArray<string>> => {
+// 	console.log(`Getting all files from ${dir}...`)
+// 	const files = await readdir(resolve(dir), { recursive: true })
+// 	console.log(`Found ${files.length} files`)
+// 	return files.filter((file) => file.endsWith('.md'))
+// }
+
 export const copy_files = async (
 	src_dir: string,
 	dest_dir: string
-): Promise<void> => {
+): Promise<ReadonlyArray<Record<string, string>>> => {
 	if (!access(src_dir)) {
 		throw new Error(`Source directory ${src_dir} does not exist`)
 	}
 	// if (!access(dest_dir)) {
 	// 	await mkdir(dest_dir, { recursive: true })
 	// }
-	console.log(`Getting all files from ${src_dir}...`)
+	console.log(
+		`Copying all files from '${src_dir}' directory to '${dest_dir}' directory...`
+	)
 	const files = await readdir(resolve(src_dir), { recursive: true })
 	console.log(`Found ${files.length} files`)
+	const copied_files = []
 	for (const file of files) {
-		console.log(`Copying ${file}...`)
+		// console.log(`Copying ${file}...`)
 		const srcPath = resolve(src_dir, file)
 		const destPath = resolve(dest_dir, file)
 		const src = Bun.file(srcPath)
-		await Bun.file(destPath).write(src)
+		await write(destPath, src)
+		copied_files.push({
+			dest: `/${dest_dir}/${file}`,
+			src: `/${src_dir}/${file}`,
+		})
 	}
+	return copied_files
 }
-export const parse_markdown = async (
-	dir: string,
-	source: string
-): Promise<Page> => {
-	const path = resolve(dir, source)
-	console.log(`Parsing ${source}...`)
-	const text = await Bun.file(path).text()
+
+// markdown parser
+export const parser = async (source: string): Promise<Page> => {
+	const file = resolve(INPUT_DIR, source)
+	// console.log(`Parsing ${source}...`)
+	const text = await Bun.file(file).text()
 	const parsed = matter(text)
 	const { data, content } = parsed
 	const html = marked(content)
 	return {
 		content: html as string,
-		file: path,
+		file: source,
 		frontmatter: {
 			...data,
 			date: data.date || new Date().toISOString(),
@@ -58,18 +98,14 @@ export const parse_markdown = async (
 	}
 }
 
-export const template_render = async (
-	dir: string,
-	template: string,
-	data: Page
-): Promise<string> => {
+// template render
+export const renderer = async (data: Page): Promise<string> => {
 	const layout = data.frontmatter?.layout
 		? `${(data.frontmatter?.layout as string).toLowerCase()}.html`
-		: `${template}.html`
-	const njk = nunjucks.configure(dir, {
+		: `${DEFAULT_LAYOUT}.html`
+	const njk = nunjucks.configure(TEMPLATE_DIR, {
 		autoescape: false,
 	})
-	// TODO: Bun.HTMLRewriter
 	const rendered = njk.render(layout, {
 		content: data.content,
 		description: data.frontmatter?.description ?? site.description,
@@ -78,7 +114,21 @@ export const template_render = async (
 		title: data.frontmatter?.title ?? '',
 	})
 	return rendered
+	// TODO: Bun.HTMLRewriter, convert assets
 	// const rewriter = new HTMLRewriter().on('title', new TitleHandler())
 	// const result = rewriter.transform(render)
 	// return result
+}
+
+// html generator
+export const generator = async (
+	data: Page
+): Promise<Record<string, string>> => {
+	const destination = resolve(OUTPUT_DIR, data.url)
+	const rendered = await renderer(data)
+	await write(destination, rendered)
+	return {
+		dest: `/${OUTPUT_DIR}/${data.url}`,
+		src: `/${INPUT_DIR}/${data.file}`,
+	}
 }
