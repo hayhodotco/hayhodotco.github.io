@@ -1,8 +1,10 @@
-import { INPUT_DIR, OUTPUT_DIR, PUBLIC_DIR } from '~lib/constants'
+import { INPUT_DIR, IS_PROD, OUTPUT_DIR, PUBLIC_DIR } from '~lib/constants'
 import { copy_files, generator, get_files, parser } from '~lib/utils'
 
 export const main = async () => {
 	try {
+		console.log(IS_PROD)
+
 		console.log('🚀 Starting build...')
 
 		// 1. get all markdown files
@@ -10,7 +12,7 @@ export const main = async () => {
 
 		// 2. parse each markdown file
 		const parsed_files = await Promise.all(markdown_files.map(parser))
-		console.table(parsed_files, ['file'])
+		console.table(parsed_files, ['file', 'url'])
 
 		// 3. generate all html files
 		const generated_files = await Promise.all(parsed_files.map(generator))

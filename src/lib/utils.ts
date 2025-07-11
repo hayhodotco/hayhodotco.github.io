@@ -1,5 +1,5 @@
 import { access, exists, mkdir, readdir } from 'node:fs/promises'
-import { basename, dirname, resolve } from 'node:path'
+import { basename, dirname, join, resolve } from 'node:path'
 import { file, Glob, write } from 'bun'
 import matter from 'gray-matter'
 import { marked } from 'marked'
@@ -9,10 +9,11 @@ import site from '~config'
 import {
 	DEFAULT_LAYOUT,
 	INPUT_DIR,
+	IS_PROD,
 	OUTPUT_DIR,
 	TEMPLATE_DIR,
 } from '~lib/constants'
-import type { Page } from '~lib/types'
+import type { Doc } from '~lib/types'
 
 // export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
 
@@ -76,44 +77,11 @@ export const copy_files = async (
 	return copied_files
 }
 
-// convert image
-export const img_converter = async (
-	src: string,
-	width?: number,
-	quality: number = 80
-): Promise<string> => {
-	const input = resolve('.', INPUT_DIR, src)
-	const input_exists = await exists(input)
-	// console.log(dirname(src).replaceAll('.', ''))
-	const output = `${OUTPUT_DIR}${dirname(src).replaceAll('.', '')}`
-	const output_exists = await exists(output)
-	const output_path = `${output}/${basename(src)}-converted.webp`
-
-	if (!input_exists) {
-		throw new Error(`File ${input} does not exist`)
-	}
-
-	if (!output_exists) {
-		await mkdir(output, { recursive: true })
-	}
-
-	// const bytes = await file(input).bytes()
-	// console.log(bytes)
-
-	let img = sharp(input)
-	if (width) {
-		img = img.resize(width)
-	}
-	await img.webp({ quality }).toFile(output_path)
-
-	return output_path.replaceAll(OUTPUT_DIR, '')
-}
-
 // markdown parser
-export const parser = async (source: string): Promise<Page> => {
-	const file = resolve(INPUT_DIR, source)
-	// console.log(`Parsing ${source}...`)
-	const text = await Bun.file(file).text()
+export const parser = async (source: string): Promise<Doc> => {
+	const path = resolve(INPUT_DIR, source)
+	console.log(`Parsing ${source}...`)
+	const text = await file(path).text()
 	const parsed = matter(text)
 	const { data, content } = parsed
 	const html = marked(content)
@@ -124,12 +92,12 @@ export const parser = async (source: string): Promise<Page> => {
 			...data,
 			date: data.date || new Date().toISOString(),
 		},
-		url: `${source.replace('.md', '.html')}`,
+		url: `${source.replace('index.md', '').replace('.md', '')}`,
 	}
 }
 
 // template render
-export const renderer = async (data: Page): Promise<string> => {
+export const renderer = async (data: Doc): Promise<string> => {
 	const layout = data.frontmatter?.layout
 		? `${(data.frontmatter?.layout as string).toLowerCase()}.html`
 		: `${DEFAULT_LAYOUT}.html`
@@ -148,15 +116,30 @@ export const renderer = async (data: Page): Promise<string> => {
 	// TODO: Bun.HTMLRewriter, convert assets
 	const rewriter = new HTMLRewriter().on('img', {
 		async element(el) {
-			const src = el.getAttribute('src')
-			// console.log('img:dirname', dirname(src as string))
-			// console.log('img:basename', basename(src as string))
-			const img = await img_converter(src as string, 800, 100)
-			console.log('img_converter', img)
-			el.setAttribute('src', img)
-			// if (src?.startsWith('./')) {
-			// 	el.setAttribute('src', `${src.slice(1)}`)
+			const src = el.getAttribute('src') as string
+			const src_dirname = dirname(src).replaceAll('.', '')
+			const src_basename = basename(src).replaceAll('.', '_')
+			const dest = `${OUTPUT_DIR}${src_dirname}`
+			const dest_exists = await exists(dest)
+			const input = resolve('.', INPUT_DIR, src)
+			const img_file = file(input)
+			// const img_exists = await img_file.exists()
+			const img_contents = await img_file.bytes()
+			const img_type = img_file.type
+			const output = IS_PROD
+				? `${dest}/${src_basename}-${Date.now()}.webp`
+				: `data:${img_type};base64,${img_contents.toBase64()}`
+
+			console.log('src', input)
+
+			if (!dest_exists) await mkdir(dest, { recursive: true })
+
+			const img = sharp(img_contents)
+			// if (width) {
+			// 	img = img.resize(width)
 			// }
+			await img.resize(500).webp({ quality: 80 }).toFile(output)
+			el.setAttribute('src', output)
 		},
 	})
 	const result = rewriter.transform(rendered)
@@ -164,14 +147,13 @@ export const renderer = async (data: Page): Promise<string> => {
 }
 
 // html generator
-export const generator = async (
-	data: Page
-): Promise<Record<string, string>> => {
-	const destination = resolve(OUTPUT_DIR, data.url)
+export const generator = async (data: Doc): Promise<Record<string, string>> => {
+	// console.log('destination', resolve(OUTPUT_DIR, data.url, 'index.html'))
+	const destination = resolve(OUTPUT_DIR, data.url, 'index.html')
 	const rendered = await renderer(data)
 	await write(destination, rendered)
 	return {
-		dest: `/${OUTPUT_DIR}/${data.url}`,
+		dest: `/${OUTPUT_DIR}/${join(data.url, 'index.html')}`,
 		src: `/${INPUT_DIR}/${data.file}`,
 	}
 }

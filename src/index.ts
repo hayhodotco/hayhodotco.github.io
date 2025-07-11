@@ -1,8 +1,7 @@
-import { img_converter } from '~lib/utils'
+import { watch } from 'node:fs/promises'
 
-async function main() {
-	const convertedImagePath = await img_converter('assets/hayho-ava.png')
-	console.log(`Converted image saved at: ${convertedImagePath}`)
+const watcher = watch(import.meta.dir)
+
+for await (const event of watcher) {
+	console.log(`Detected ${event.eventType} in ${event.filename}`)
 }
-
-await main()
