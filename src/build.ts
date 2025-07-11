@@ -20,12 +20,6 @@ export const main = async () => {
 		const copied_files = await copy_files(PUBLIC_DIR, OUTPUT_DIR)
 		console.table(copied_files, ['src', 'dest'])
 
-		// 5. copy assets files
-		// const assets_dir = resolve(INPUT_DIR, ASSET_DIR)
-		// const copy_dir = resolve(OUTPUT_DIR, ASSET_DIR)
-		// await copy_files(assets_dir, copy_dir)
-		// console.log(assets_dir, copy_dir)
-
 		console.log('\n🎉 Build complete!')
 	} catch (err) {
 		console.error(err)

@@ -1,13 +1,10 @@
-import {
-	access,
-	readdir,
-	// mkdir,
-} from 'node:fs/promises'
-import { resolve } from 'node:path'
-import { Glob, write } from 'bun'
+import { access, exists, mkdir, readdir } from 'node:fs/promises'
+import { basename, dirname, resolve } from 'node:path'
+import { file, Glob, write } from 'bun'
 import matter from 'gray-matter'
 import { marked } from 'marked'
 import nunjucks from 'nunjucks'
+import sharp from 'sharp'
 import site from '~config'
 import {
 	DEFAULT_LAYOUT,
@@ -79,6 +76,39 @@ export const copy_files = async (
 	return copied_files
 }
 
+// convert image
+export const img_converter = async (
+	src: string,
+	width?: number,
+	quality: number = 80
+): Promise<string> => {
+	const input = resolve('.', INPUT_DIR, src)
+	const input_exists = await exists(input)
+	// console.log(dirname(src).replaceAll('.', ''))
+	const output = `${OUTPUT_DIR}${dirname(src).replaceAll('.', '')}`
+	const output_exists = await exists(output)
+	const output_path = `${output}/${basename(src)}-converted.webp`
+
+	if (!input_exists) {
+		throw new Error(`File ${input} does not exist`)
+	}
+
+	if (!output_exists) {
+		await mkdir(output, { recursive: true })
+	}
+
+	// const bytes = await file(input).bytes()
+	// console.log(bytes)
+
+	let img = sharp(input)
+	if (width) {
+		img = img.resize(width)
+	}
+	await img.webp({ quality }).toFile(output_path)
+
+	return output_path.replaceAll(OUTPUT_DIR, '')
+}
+
 // markdown parser
 export const parser = async (source: string): Promise<Page> => {
 	const file = resolve(INPUT_DIR, source)
@@ -109,15 +139,28 @@ export const renderer = async (data: Page): Promise<string> => {
 	const rendered = njk.render(layout, {
 		content: data.content,
 		description: data.frontmatter?.description ?? site.description,
+		generator: `HayhoCMS v${Bun.version}`,
 		locale: site.locale,
 		site_name: site.name,
 		title: data.frontmatter?.title ?? '',
 	})
-	return rendered
+	// return rendered
 	// TODO: Bun.HTMLRewriter, convert assets
-	// const rewriter = new HTMLRewriter().on('title', new TitleHandler())
-	// const result = rewriter.transform(render)
-	// return result
+	const rewriter = new HTMLRewriter().on('img', {
+		async element(el) {
+			const src = el.getAttribute('src')
+			// console.log('img:dirname', dirname(src as string))
+			// console.log('img:basename', basename(src as string))
+			const img = await img_converter(src as string, 800, 100)
+			console.log('img_converter', img)
+			el.setAttribute('src', img)
+			// if (src?.startsWith('./')) {
+			// 	el.setAttribute('src', `${src.slice(1)}`)
+			// }
+		},
+	})
+	const result = rewriter.transform(rendered)
+	return result
 }
 
 // html generator

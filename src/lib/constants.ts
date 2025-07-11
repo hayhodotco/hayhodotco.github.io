@@ -4,3 +4,4 @@ export const DEFAULT_LAYOUT = 'page'
 export const OUTPUT_DIR = 'dist'
 export const INPUT_DIR = 'pages'
 export const ASSET_DIR = 'assets'
+export const ROOT_DIR = process.cwd()

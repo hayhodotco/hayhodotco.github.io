@@ -3,6 +3,8 @@ title: Hello, World!
 description: A simple introduction to Markdown.
 ---
 
+![Hello, World!](./img/gh-ava.png)
+
 # Hello, World!
 
 ## Introduction
@@ -29,4 +31,4 @@ To get started with Markdown, you can use a simple text editor or a dedicated Ma
 - [Markdown Cookbook](https://www.markdownguide.org/cookbook/)
 - [Markdown FAQ](https://www.markdownguide.org/faq/)
 
-![Hayho](./assets/hayho-ava.png)
+![Hayho](../assets/hayho-ava.png)

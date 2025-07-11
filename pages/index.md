@@ -12,3 +12,5 @@ This website is currently under construction. We apologize for any inconvenience
 - [x] Navigation menu
 - [ ] Blog section
 - [ ] Portfolio section
+
+![nndvn/cfgs](../assets/nndvn-cfgs.png)
