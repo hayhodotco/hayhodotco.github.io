@@ -126,20 +126,23 @@ export const renderer = async (data: Doc): Promise<string> => {
 			// const img_exists = await img_file.exists()
 			const img_contents = await img_file.bytes()
 			const img_type = img_file.type
-			const output = IS_PROD
-				? `${dest}/${src_basename}-${Date.now()}.webp`
+			const output = `${dest}/${src_basename}-${Date.now()}.webp`
+			const src_new = IS_PROD
+				? `${src_dirname}/${src_basename}-${Date.now()}.webp`
 				: `data:${img_type};base64,${img_contents.toBase64()}`
 
-			console.log('src', input)
+			console.log('src_new', src_new)
 
-			if (!dest_exists) await mkdir(dest, { recursive: true })
+			if (IS_PROD) {
+				if (!dest_exists) await mkdir(dest, { recursive: true })
+				const img = sharp(img_contents)
+				// if (width) {
+				// 	img = img.resize(width)
+				// }
+				await img.resize(500).webp({ quality: 80 }).toFile(output)
+			}
 
-			const img = sharp(img_contents)
-			// if (width) {
-			// 	img = img.resize(width)
-			// }
-			await img.resize(500).webp({ quality: 80 }).toFile(output)
-			el.setAttribute('src', output)
+			el.setAttribute('src', src_new)
 		},
 	})
 	const result = rewriter.transform(rendered)

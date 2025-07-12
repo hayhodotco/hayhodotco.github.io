@@ -23,7 +23,7 @@
 		"fix": "biome check --fix",
 		"format": "biome format --fix",
 		"lint": "biome lint --fix",
-		"preview": "bun ./dist/**/*.html"
+		"preview": "bun run build && NODE_ENV=production bun --watch --hot run src/server.ts"
 	},
 	"type": "module"
 }
