@@ -1,7 +1,14 @@
-import { watch } from 'node:fs/promises'
+// import { file } from 'bun'
+// import { parse } from 'yaml'
 
-const watcher = watch(import.meta.dir)
+// const text = await file('site.yaml').text()
+// const json = parse(text)
+// console.log(json.favicon)
 
-for await (const event of watcher) {
-	console.log(`Detected ${event.eventType} in ${event.filename}`)
-}
+import { ROOT_DIR } from '~lib/constants'
+import { get_files } from '~lib/utils'
+
+console.log(ROOT_DIR)
+
+const files = await get_files(ROOT_DIR, '**[!node_modules]/*.{md,mdx}')
+console.log(files)

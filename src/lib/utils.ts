@@ -1,11 +1,11 @@
 import { access, exists, mkdir, readdir } from 'node:fs/promises'
-import { basename, dirname, join, resolve } from 'node:path'
+import { basename, dirname, join, relative, resolve } from 'node:path'
 import { file, Glob, write } from 'bun'
 import matter from 'gray-matter'
 import { marked } from 'marked'
 import nunjucks from 'nunjucks'
 import sharp from 'sharp'
-import site from '~config'
+import { CONFIG } from '~lib/config'
 import {
 	DEFAULT_LAYOUT,
 	INPUT_DIR,
@@ -35,7 +35,7 @@ export const get_files = async (
 		files.push(file)
 	}
 
-	console.log(`Found ${files.length} files`)
+	console.log(`Found ${files.length} file(s)`)
 	return files
 }
 // export const get_all_markdowns = async (
@@ -87,12 +87,12 @@ export const parser = async (source: string): Promise<Doc> => {
 	const html = marked(content)
 	return {
 		content: html as string,
-		file: source,
+		file: relative('.', path),
 		frontmatter: {
 			...data,
 			date: data.date || new Date().toISOString(),
 		},
-		url: `${source.replace('index.md', '').replace('.md', '')}`,
+		url: `/${source.replace('index', '/').replace('.md', '')}`,
 	}
 }
 
@@ -106,10 +106,10 @@ export const renderer = async (data: Doc): Promise<string> => {
 	})
 	const rendered = njk.render(layout, {
 		content: data.content,
-		description: data.frontmatter?.description ?? site.description,
+		description: data.frontmatter?.description ?? CONFIG.description,
 		generator: `HayhoCMS v${Bun.version}`,
-		locale: site.locale,
-		site_name: site.name,
+		locale: CONFIG.locale,
+		site_name: CONFIG.name,
 		title: data.frontmatter?.title ?? '',
 	})
 	// return rendered
@@ -131,7 +131,8 @@ export const renderer = async (data: Doc): Promise<string> => {
 				? `${src_dirname}/${src_basename}-${Date.now()}.webp`
 				: `data:${img_type};base64,${img_contents.toBase64()}`
 
-			console.log('src_new', src_new)
+			console.log('relative', relative('.', input))
+			console.log('input', src, 'output', src_new.substring(0, 50))
 
 			if (IS_PROD) {
 				if (!dest_exists) await mkdir(dest, { recursive: true })
@@ -154,7 +155,8 @@ export const generator = async (data: Doc): Promise<Record<string, string>> => {
 	// console.log('destination', resolve(OUTPUT_DIR, data.url, 'index.html'))
 	const destination = resolve(OUTPUT_DIR, data.url, 'index.html')
 	const rendered = await renderer(data)
-	await write(destination, rendered)
+	console.log(destination, rendered.substring(0, 50))
+	// await write(destination, rendered)
 	return {
 		dest: `/${OUTPUT_DIR}/${join(data.url, 'index.html')}`,
 		src: `/${INPUT_DIR}/${data.file}`,

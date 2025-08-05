@@ -1,5 +1,19 @@
 url: https://hayhodotco.github.io/
 title: Hayho
 description: A personal website
-keywords: Hayho, personal website, blog, portfolio
+keywords: hayho, personal website, blog, portfolio
 favicon: favicon.ico
+author: Hayho Co <hayho@hayhodotco.github.io> (https://hayhodotco.github.io)
+social:
+  facebook: https://www.facebook.com/hayhodotco
+  twitter: https://twitter.com/hayhodotco
+  instagram: https://www.instagram.com/hayhodotco
+  linkedin: https://www.linkedin.com/in/hayhodotco
+  github: https://github.com/hayhodotco
+  youtube: https://www.youtube.com/hayhodotco
+  twitch: https://www.twitch.tv/hayhodotco
+  discord: https://discord.gg/hayhodotco
+  reddit: https://www.reddit.com/user/hayhodotco
+  email: hayho@hayhodotco.github.io
+locale: en-US
+email: hayho@hayhodotco.github.io

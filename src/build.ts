@@ -3,7 +3,7 @@ import { copy_files, generator, get_files, parser } from '~lib/utils'
 
 export const main = async () => {
 	try {
-		console.log(IS_PROD)
+		console.log('IS_PROD', IS_PROD)
 
 		console.log('🚀 Starting build...')
 

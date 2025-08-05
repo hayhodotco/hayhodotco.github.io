@@ -1,12 +1,13 @@
 import { lstat } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { file, serve } from 'bun'
-import { OUTPUT_DIR } from '~lib/constants'
+import { IS_PROD, OUTPUT_DIR } from '~lib/constants'
 
 export const main = async () => {
 	try {
+		console.log('IS_PROD', IS_PROD)
 		const server = serve({
-			development: true,
+			development: !IS_PROD,
 			// fetch(req, server) {
 			// 	const ip = server.requestIP(req)
 			// 	// 	const slug = new URL(req.url).pathname
@@ -14,10 +15,9 @@ export const main = async () => {
 			// 	return new Response(`Your IP is ${ip?.address || 'unknown'}`)
 			// 	// 	return new Response('Not Found', { status: 404 })
 			// },
-			port: 3000,
+			port: 8080,
 			routes: {
 				'/*': async (req) => {
-					console.log(import.meta.env.NODE_ENV)
 					console.log(`[*] ${new URL(req.url).pathname}`)
 
 					try {

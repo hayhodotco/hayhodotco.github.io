@@ -31,8 +31,10 @@
 		"baseUrl": ".",
 		"paths": {
 			// "~/*": ["./*"],
-			"~config": ["site.json"],
 			"~lib/*": ["./src/lib/*"]
 		}
+
+		// Plugins
+		// "plugins": [{ "name": "typescript-plugin-yaml" }]
 	}
 }
