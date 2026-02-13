@@ -8,7 +8,7 @@
 import { ROOT_DIR } from '~lib/constants'
 import { get_files } from '~lib/utils'
 
-console.log(ROOT_DIR)
+console.log('ROOT_DIR', ROOT_DIR)
 
 const files = await get_files(ROOT_DIR, '**[!node_modules]/*.{md,mdx}')
 console.log(files)

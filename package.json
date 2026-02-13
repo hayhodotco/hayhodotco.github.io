@@ -20,8 +20,8 @@
 	},
 	"private": true,
 	"scripts": {
-		"build": "rm -rf dist && NODE_ENV=production bun run src/build.ts",
-		"dev": "rm -rf dist && bun run src/build.ts && bun --watch --hot run src/server.ts",
+		"build": "rm -rf .out && NODE_ENV=production bun run src/build.ts",
+		"dev": "rm -rf .out && bun run src/build.ts && bun --watch --hot run src/server.ts",
 		"fix": "biome check --fix",
 		"format:fix": "biome format --fix",
 		"lint:fix": "biome lint --fix",
